@@ -99,9 +99,32 @@ socketio.Socket.prototype.socket_ = null;
 
 
 /** @override */
-socketio.Socket.prototype.addEventListener = function(type, handler,
-    opt_capture, opt_handlerScope) {
+socketio.Socket.prototype.listen = function(type, listener, opt_useCapture,
+      opt_listenerScope) {
 
+  this.setWrapperIfNecessary_(type);
+  goog.base(this, 'listen', type, listener, opt_useCapture,
+      opt_listenerScope);
+};
+
+
+/** @override */
+socketio.Socket.prototype.listenOnce = function(type, listener, opt_useCapture,
+      opt_listenerScope) {
+
+  this.setWrapperIfNecessary_(type);
+  goog.base(this, 'listenOnce', type, listener, opt_useCapture,
+      opt_listenerScope);
+};
+
+
+/**
+ * Sets event listener wrapper if necessary.
+ * Do not set the wrapper if specified event type was already set.
+ * @param {string} type The event type to listen.
+ * @private
+ */
+socketio.Socket.prototype.setWrapperIfNecessary_ = function(type) {
   var wrapperMap = socketio.Socket.wrapperMap_;
   var wrapper;
 
@@ -109,9 +132,6 @@ socketio.Socket.prototype.addEventListener = function(type, handler,
     wrapper = wrapperMap[type] = this.createWrapper(type)
     this.addCustomEventListener_(type, wrapper)
   }
-
-  goog.base(this, 'addEventListener', type, handler, opt_capture,
-      opt_handlerScope);
 };
 
 
