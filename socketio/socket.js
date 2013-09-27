@@ -102,9 +102,11 @@ socketio.Socket.prototype.addEventListener = function(type, handler,
   var wrapperMap = socketio.Socket.wrapperMap_;
   var wrapper;
 
+  console.log(type);
   if (!(type in wrapperMap)) {
     wrapper = wrapperMap[type] = this.createWrapper(type)
     this.addCustomEventListener(type, wrapper)
+    console.log(wrapperMap);
   }
 
   goog.base(this, 'addEventListener', type, handler, opt_capture,
@@ -117,7 +119,8 @@ socketio.Socket.prototype.addEventListener = function(type, handler,
  * @private
  */
 socketio.Socket.prototype.assertSocketExists_ = function() {
-  goog.asserts.assert(goog.isDef(this.socket_), 'This socket is not opened.');
+  goog.asserts.assert(goog.isDefAndNotNull(this.socket_),
+      'This socket is not opened.');
 };
 
 
@@ -254,8 +257,21 @@ socketio.Socket.prototype.send = function(message) {
  * @param {{type: string, data: *}} e The event to dispatch.
  */
 socketio.Socket.prototype.dispatchEventOnServer = function(e) {
+  var type, data;
+
+  if (goog.isString(e)) {
+    type = e;
+    data = null;
+  }
+  else {
+    type = e.type;
+    data = e.data;
+  }
+
+  goog.asserts.assertString(type);
+
   this.assertSocketExists_();
-  this.socket_['emit'](e.type, e.data);
+  this.socket_['emit'](type, data);
 };
 
 
@@ -279,6 +295,8 @@ socketio.Socket.prototype.handleScriptLoad_ = function() {
   if (!goog.isDefAndNotNull(io)) {
     throw Error('Cannot find io: ' + io);
   }
+
+  this.socket_ = io['connect'](this.serverAddr_);
 };
 
 
