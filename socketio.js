@@ -7,7 +7,7 @@
  */
 
 
-goog.provide('socketIo.Socket');
+goog.provide('socketio.Socket');
 
 goog.require('goog.Uri');
 goog.require('goog.array');
@@ -23,12 +23,12 @@ goog.require('goog.events.EventTarget');
  * @constructor
  * @extends {goog.events.EventTarget}
  */
-socketIo.Socket = function() {
+socketio.Socket = function() {
   goog.base(this);
 
   this.handler_ = new goog.events.EventHandler(this);
 };
-goog.inherits(socketIo.Socket, goog.events.EventTarget);
+goog.inherits(socketio.Socket, goog.events.EventTarget);
 
 
 /**
@@ -36,7 +36,7 @@ goog.inherits(socketIo.Socket, goog.events.EventTarget);
  * @type {string}
  * @const
  */
-socketIo.Socket.SCRIPT_PATH = '/socket.io/socket.io.js';
+socketio.Socket.SCRIPT_PATH = '/socket.io/socket.io.js';
 
 
 /**
@@ -44,7 +44,7 @@ socketIo.Socket.SCRIPT_PATH = '/socket.io/socket.io.js';
  * See: https://github.com/LearnBoost/socket.io/wiki/Exposed-events#client
  * @enum {string}
  */
-socketIo.Socket.EventType = {
+socketio.Socket.EventType = {
   /** "connect" is emitted when the socket connected successfully. */
   CONNECT: 'connect',
 
@@ -77,14 +77,14 @@ socketIo.Socket.EventType = {
  * @type {boolean}
  * @private
  */
-socketIo.Socket.imported_ = false;
+socketio.Socket.imported_ = false;
 
 
 /**
  * @type {Object.<function>}
  * @private
  */
-socketIo.Socket.wrapperMap_ = {};
+socketio.Socket.wrapperMap_ = {};
 
 
 /**
@@ -92,14 +92,14 @@ socketIo.Socket.wrapperMap_ = {};
  * @type {SocketNamespace}
  * @private
  */
-socketIo.Socket.prototype.socket_ = null;
+socketio.Socket.prototype.socket_ = null;
 
 
 /** @override */
-socketIo.Socket.prototype.addEventListener = function(type, handler,
+socketio.Socket.prototype.addEventListener = function(type, handler,
     opt_capture, opt_handlerScope) {
 
-  var wrapperMap = socketIo.Socket.wrapperMap_;
+  var wrapperMap = socketio.Socket.wrapperMap_;
   var wrapper;
 
   if (!(type in wrapperMap)) {
@@ -116,7 +116,7 @@ socketIo.Socket.prototype.addEventListener = function(type, handler,
  * Asserts whether this socket is opened.
  * @private
  */
-socketIo.Socket.prototype.assertSocketExists_ = function() {
+socketio.Socket.prototype.assertSocketExists_ = function() {
   goog.asserts.assert(goog.isDef(this.socket_), 'This socket is not opened.');
 };
 
@@ -127,7 +127,7 @@ socketIo.Socket.prototype.assertSocketExists_ = function() {
  * @param {Function|Object} handler The function to handle the event.
  * @private
  */
-socketIo.Socket.prototype.addCustomEventListener_ = function(type, handler) {
+socketio.Socket.prototype.addCustomEventListener_ = function(type, handler) {
   this.assertSocketExists_();
   this.socket_['on'](type, handler);
 };
@@ -140,8 +140,8 @@ socketIo.Socket.prototype.addCustomEventListener_ = function(type, handler) {
  * @param {Function|Object} handler The function to handle the event.
  * @private
  */
-socketIo.Socket.prototype.removeCustomEventListener_ = function(type, handler) {
-  var wrapperMap = socketIo.Socket.wrapperMap_;
+socketio.Socket.prototype.removeCustomEventListener_ = function(type, handler) {
+  var wrapperMap = socketio.Socket.wrapperMap_;
 
   this.assertSocketExists_();
   this.socket_['removeListener'](type, handler);
@@ -154,22 +154,22 @@ socketIo.Socket.prototype.removeCustomEventListener_ = function(type, handler) {
  * @return {Function} Created wrapper function.
  * @protected
  */
-socketIo.Socket.prototype.createWrapper = function(type) {
+socketio.Socket.prototype.createWrapper = function(type) {
   var wrapper;
   var that = this;
 
   switch (type) {
-    case socketIo.Socket.EventType.MESSAGE:
+    case socketio.Socket.EventType.MESSAGE:
       return function(msg) {
         that.dispatchEvent({ type: type, message: msg });
       };
-    case socketIo.Socket.EventType.CONNECT:
+    case socketio.Socket.EventType.CONNECT:
       return function() {
         that.dispatchEvent({ type: type });
       };
-    case socketIo.Socket.EventType.DISCONNECT:
-    case socketIo.Socket.EventType.CONNECT_FAILED:
-    case socketIo.Socket.EventType.ERROR:
+    case socketio.Socket.EventType.DISCONNECT:
+    case socketio.Socket.EventType.CONNECT_FAILED:
+    case socketio.Socket.EventType.ERROR:
       return function(reason) {
         that.dispatchEvent({ type: type, data: reason });
       };
@@ -187,8 +187,8 @@ socketIo.Socket.prototype.createWrapper = function(type) {
  *
  * @return {boolean} True if the web socket is open, false otherwise.
  */
-socketIo.Socket.prototype.isOpen = function() {
-  return socketIo.Socket.imported_ && this.socket_ &&
+socketio.Socket.prototype.isOpen = function() {
+  return socketio.Socket.imported_ && this.socket_ &&
       this.socket_['socket']['open'];
 };
 
@@ -198,7 +198,7 @@ socketIo.Socket.prototype.isOpen = function() {
  *
  * @param {string} url The URL to which to connect.
  */
-socketIo.Socket.prototype.open = function(url) {
+socketio.Socket.prototype.open = function(url) {
   this.serverAddr_ = url;
   this.importSocketIo();
 };
@@ -207,15 +207,15 @@ socketIo.Socket.prototype.open = function(url) {
 /**
  * Imports client-side Socket.IO script.
  */
-socketIo.Socket.prototype.importSocketIo = function() {
-  if (socketIo.Socket.imported_) {
+socketio.Socket.prototype.importSocketIo = function() {
+  if (socketio.Socket.imported_) {
     this.handleScriptLoad_();
     return;
   }
 
   var dom = goog.dom.getDomHelper();
   var uriObj = goog.Uri.parse(this.serverAddr_);
-  uriObj.setPath(socketIo.Socket.SCRIPT_PATH);
+  uriObj.setPath(socketio.Socket.SCRIPT_PATH);
 
   var script = goog.dom.createDom('script', { 'src': uriObj.toString(),
       'type': 'text/javascript' });
@@ -224,7 +224,7 @@ socketIo.Socket.prototype.importSocketIo = function() {
       this.handleScriptLoad_);
 
   dom.getDocument().body.appendChild(script)
-  socketIo.Socket.imported_ = true;
+  socketio.Socket.imported_ = true;
 };
 
 
@@ -232,7 +232,7 @@ socketIo.Socket.prototype.importSocketIo = function() {
  * Closes the web socket connection.
  */
 
-socketIo.Socket.prototype.close = function() {
+socketio.Socket.prototype.close = function() {
   this.assertSocketExists_();
   this.socket_['disconnect']();
 };
@@ -243,7 +243,7 @@ socketIo.Socket.prototype.close = function() {
  *
  * @param {string} message The message to send.
  */
-socketIo.Socket.prototype.send = function(message) {
+socketio.Socket.prototype.send = function(message) {
   this.assertSocketExists_();
   this.socket_['send'](message);
 };
@@ -253,7 +253,7 @@ socketIo.Socket.prototype.send = function(message) {
  * Dispatechs event on the connected server.
  * @param {{type: string, data: *}} e The event to dispatch.
  */
-socketIo.Socket.prototype.dispatchEventOnServer = function(e) {
+socketio.Socket.prototype.dispatchEventOnServer = function(e) {
   this.assertSocketExists_();
   this.socket_['emit'](e.type, e.data);
 };
@@ -263,8 +263,8 @@ socketIo.Socket.prototype.dispatchEventOnServer = function(e) {
  * Handles Socket.IO message event.
  * @private
  */
-socketIo.Socket.prototype.onmessage_ = function(msg) {
-  this.dispatchEvent({ type: socketIo.Socket.EventType.MESSAGE,
+socketio.Socket.prototype.onmessage_ = function(msg) {
+  this.dispatchEvent({ type: socketio.Socket.EventType.MESSAGE,
       message: msg });
 };
 
@@ -273,7 +273,7 @@ socketIo.Socket.prototype.onmessage_ = function(msg) {
  * Handles the event when fired client-side Socket.IO script was loaded.
  * @private
  */
-socketIo.Socket.prototype.handleScriptLoad_ = function() {
+socketio.Socket.prototype.handleScriptLoad_ = function() {
   var io = goog.global['io'];
 
   if (!goog.isDefAndNotNull(io)) {
@@ -283,7 +283,7 @@ socketIo.Socket.prototype.handleScriptLoad_ = function() {
 
 
 /** @override */
-socketIo.Socket.prototype.disposeInternal = function() {
+socketio.Socket.prototype.disposeInternal = function() {
   goog.base(this, 'disposeInternal');
 
   if (this.isOpen()) {
