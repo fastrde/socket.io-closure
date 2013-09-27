@@ -46,7 +46,7 @@ socketio.Socket.SCRIPT_PATH = '/socket.io/socket.io.js';
  */
 socketio.Socket.EventType = {
   /** "load" is emitted when the socket was loaded. */
-  LOAD: 'LOAD',
+  LOAD: 'load',
 
   /** "connect" is emitted when the socket connected successfully. */
   CONNECT: 'connect',
@@ -128,7 +128,7 @@ socketio.Socket.prototype.setWrapperIfNecessary_ = function(type) {
   var wrapperMap = socketio.Socket.wrapperMap_;
   var wrapper;
 
-  if (!(type in wrapperMap)) {
+  if (type !== socketio.Socket.EventType.LOAD && !(type in wrapperMap)) {
     wrapper = wrapperMap[type] = this.createWrapper(type)
     this.addCustomEventListener_(type, wrapper)
   }
