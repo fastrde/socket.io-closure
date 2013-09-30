@@ -94,7 +94,7 @@ socketio.Socket.State = {
  * @type {socketio.Socket.State}
  * @private
  */
-socketio.Socket.status = socketio.Socket.State.UNINITIALIZED;
+socketio.Socket.state = socketio.Socket.State.UNINITIALIZED;
 
 
 /**
