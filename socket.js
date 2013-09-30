@@ -242,10 +242,13 @@ socketio.Socket.prototype.isOpen = function() {
  * Creates and opens the Socket.IO.
  *
  * @param {string} url The URL to which to connect.
+ * @param {boolean=} opt_enableDup Optional flag to enable duplicated
+ *     connections.
  */
-socketio.Socket.prototype.open = function(url) {
+socketio.Socket.prototype.open = function(url, opt_enableDup) {
   this.serverAddr_ = url;
-  this.importSocketIo();
+  this.enableDup_ = !!opt_enableDup;
+  this.importSocketIo(opt_enableDup);
 };
 
 
@@ -352,7 +355,12 @@ socketio.Socket.prototype.handleScriptLoad_ = function() {
 
   socketio.Socket.state = socketio.Socket.State.COMPLETE;
 
-  this.socket_ = io['connect'](this.serverAddr_);
+  if (this.enableDup_) {
+    this.socket_ = io['connect'](this.serverAddr_, { 'force new connection' : true });
+  }
+  else {
+    this.socket_ = io['connect'](this.serverAddr_);
+  }
   this.dispatchEvent(socketio.Socket.EventType.LOAD);
 };
 
