@@ -246,23 +246,32 @@ socketio.Socket.prototype.open = function(url) {
  * Imports client-side Socket.IO script.
  */
 socketio.Socket.prototype.importSocketIo = function() {
-  if (socketio.Socket.state !== socketio.Socket.State.UNINITIALIZED) {
-    this.handleScriptLoad_();
-    return;
+
+  switch (socketio.Socket.state) {
+    case socketio.Socket.State.COMPLETE:
+      this.handleScriptLoad_();
+      break;
+    case socketio.Socket.State.LOADING:
+      this.handler_.listen(script, goog.events.EventType.LOAD,
+          this.handleScriptLoad_);
+      break;
+    case socketio.Socket.State.LOADING:
+      var dom = goog.dom.getDomHelper();
+      var uriObj = goog.Uri.parse(this.serverAddr_);
+      uriObj.setPath(socketio.Socket.SCRIPT_PATH);
+
+      var script = goog.dom.createDom('script', { 'src': uriObj.toString(),
+          'type': 'text/javascript' });
+
+      this.handler_.listen(script, goog.events.EventType.LOAD,
+          this.handleScriptLoad_);
+
+      dom.getDocument().body.appendChild(script)
+      socketio.Socket.state = socketio.Socket.State.LOADING;
+      break;
+    default:
+      throw Error('Invalid state: ' + socketio.Socket.state);
   }
-
-  var dom = goog.dom.getDomHelper();
-  var uriObj = goog.Uri.parse(this.serverAddr_);
-  uriObj.setPath(socketio.Socket.SCRIPT_PATH);
-
-  var script = goog.dom.createDom('script', { 'src': uriObj.toString(),
-      'type': 'text/javascript' });
-
-  this.handler_.listen(script, goog.events.EventType.LOAD,
-      this.handleScriptLoad_);
-
-  dom.getDocument().body.appendChild(script)
-  socketio.Socket.state = socketio.Socket.State.LOADING;
 };
 
 
