@@ -91,10 +91,10 @@ socketio.Socket.State = {
 
 /**
  * Whether the client-side Socket.IO script was imported.
- * @type {boolean}
+ * @type {socketio.Socket.State}
  * @private
  */
-socketio.Socket.status = false;
+socketio.Socket.status = socketio.Socket.State.UNINITIALIZED;
 
 
 /**
@@ -255,7 +255,7 @@ socketio.Socket.prototype.importSocketIo = function() {
       this.handler_.listen(script, goog.events.EventType.LOAD,
           this.handleScriptLoad_);
       break;
-    case socketio.Socket.State.LOADING:
+    case socketio.Socket.State.UNINITIALIZED:
       var dom = goog.dom.getDomHelper();
       var uriObj = goog.Uri.parse(this.serverAddr_);
       uriObj.setPath(socketio.Socket.SCRIPT_PATH);
