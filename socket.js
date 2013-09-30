@@ -92,9 +92,16 @@ socketio.Socket.State = {
 /**
  * Whether the client-side Socket.IO script was imported.
  * @type {socketio.Socket.State}
- * @private
  */
 socketio.Socket.state = socketio.Socket.State.UNINITIALIZED;
+
+
+/**
+ * Element ID for the Socket.IO script tag.
+ * @type {string}
+ * @const
+ */
+socketio.Socket.SCRIPT_ID = 'socket-io-closure';
 
 
 /**
@@ -246,27 +253,30 @@ socketio.Socket.prototype.open = function(url) {
  * Imports client-side Socket.IO script.
  */
 socketio.Socket.prototype.importSocketIo = function() {
+  var script;
 
   switch (socketio.Socket.state) {
     case socketio.Socket.State.COMPLETE:
       this.handleScriptLoad_();
       break;
     case socketio.Socket.State.LOADING:
+      script = goog.dom.getElement(socketio.Socket.SCRIPT_ID);
       this.handler_.listen(script, goog.events.EventType.LOAD,
           this.handleScriptLoad_);
       break;
     case socketio.Socket.State.UNINITIALIZED:
-      var dom = goog.dom.getDomHelper();
       var uriObj = goog.Uri.parse(this.serverAddr_);
       uriObj.setPath(socketio.Socket.SCRIPT_PATH);
 
-      var script = goog.dom.createDom('script', { 'src': uriObj.toString(),
-          'type': 'text/javascript' });
+      script = goog.dom.createDom('script', {
+          'src': uriObj.toString(),
+          'type': 'text/javascript',
+          'id': socketio.Socket.SCRIPT_ID });
 
       this.handler_.listen(script, goog.events.EventType.LOAD,
           this.handleScriptLoad_);
 
-      dom.getDocument().body.appendChild(script)
+      goog.dom.getDocument().body.appendChild(script)
       socketio.Socket.state = socketio.Socket.State.LOADING;
       break;
     default:
