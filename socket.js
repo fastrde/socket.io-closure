@@ -40,7 +40,7 @@ socketio.Socket.SCRIPT_PATH = '/socket.io/socket.io.js';
 
 
 /**
- * Event type fot the Socket.IO.
+ * Event type for the Socket.IO.
  * See: https://github.com/LearnBoost/socket.io/wiki/Exposed-events#client
  * @enum {string}
  */
@@ -76,11 +76,25 @@ socketio.Socket.EventType = {
 
 
 /**
+ * State for theSocket.IO sciprt loading.
+ * @enum {string}
+ */
+socketio.Socket.State = {
+  /** Has not started loading yet. */
+  UNINITIALIZED: 'uninitialized',
+  /** Is loading. */
+  LOADING: 'loading',
+  /** Fully loaded. */
+  COMPLETE: 'complete'
+};
+
+
+/**
  * Whether the client-side Socket.IO script was imported.
  * @type {boolean}
  * @private
  */
-socketio.Socket.imported_ = false;
+socketio.Socket.status = false;
 
 
 /**
@@ -232,7 +246,7 @@ socketio.Socket.prototype.open = function(url) {
  * Imports client-side Socket.IO script.
  */
 socketio.Socket.prototype.importSocketIo = function() {
-  if (socketio.Socket.imported_) {
+  if (socketio.Socket.state !== socketio.Socket.State.UNINITIALIZED) {
     this.handleScriptLoad_();
     return;
   }
@@ -248,7 +262,7 @@ socketio.Socket.prototype.importSocketIo = function() {
       this.handleScriptLoad_);
 
   dom.getDocument().body.appendChild(script)
-  socketio.Socket.imported_ = true;
+  socketio.Socket.state = socketio.Socket.State.LOADING;
 };
 
 
@@ -316,6 +330,8 @@ socketio.Socket.prototype.handleScriptLoad_ = function() {
   if (!goog.isDefAndNotNull(io)) {
     throw Error('Cannot find io: ' + io);
   }
+
+  socketio.Socket.state = socketio.Socket.State.COMPLETE;
 
   this.socket_ = io['connect'](this.serverAddr_);
   this.dispatchEvent(socketio.Socket.EventType.LOAD);
