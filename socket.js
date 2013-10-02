@@ -229,7 +229,6 @@ socketio.Socket.prototype.createWrapper = function(type) {
 
 /**
  * Checks to see if the web socket is open or not.
- *
  * @return {boolean} True if the web socket is open, false otherwise.
  */
 socketio.Socket.prototype.isOpen = function() {
@@ -240,14 +239,12 @@ socketio.Socket.prototype.isOpen = function() {
 
 /**
  * Creates and opens the Socket.IO.
- *
  * @param {string} url The URL to which to connect.
- * @param {boolean=} opt_enableDup Optional flag to enable duplicated
- *     connections.
+ * @param {?Object=} opt_options Optional arguments for Socket.IO.
  */
-socketio.Socket.prototype.open = function(url, opt_enableDup) {
+socketio.Socket.prototype.open = function(url, opt_options) {
   this.serverAddr_ = url;
-  this.enableDup_ = !!opt_enableDup;
+  this.enableDup_ = !!opt_enableOptions;
   this.importSocketIo(opt_enableDup);
 };
 
@@ -300,7 +297,6 @@ socketio.Socket.prototype.close = function() {
 
 /**
  * Sends the message over the web socket.
- *
  * @param {string} message The message to send.
  */
 socketio.Socket.prototype.send = function(message) {
