@@ -242,10 +242,10 @@ socketio.Socket.prototype.isOpen = function() {
  * @param {string} url The URL to which to connect.
  * @param {?Object=} opt_options Optional arguments for Socket.IO.
  */
-socketio.Socket.prototype.open = function(url, opt_options) {
+socketio.Socket.prototype.open = function(url, opt_enableOptions) {
   this.serverAddr_ = url;
   this.enableDup_ = !!opt_enableOptions;
-  this.importSocketIo(opt_enableDup);
+  this.importSocketIo();
 };
 
 
